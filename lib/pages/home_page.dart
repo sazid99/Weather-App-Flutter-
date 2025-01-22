@@ -1,13 +1,20 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:weather/pages/location_get.dart';
 import 'package:weather/themes/theme.dart';
 import 'package:weather/widgets/additional_info_widget.dart';
 import 'package:weather/widgets/hourly_forecast_widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String cityName;
+
+  const HomePage({
+    super.key,
+    this.cityName = "Jamalpur",
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,12 +22,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double? temperature;
-  String cityName = "Jamalpur";
 
   Future fetchData() async {
     try {
       final url = Uri.parse(
-          "https://api.weatherapi.com/v1/current.json?key=77cad40d91db4ffa94b162015250501&q=$cityName&aqi=no");
+          "https://api.weatherapi.com/v1/current.json?key=77cad40d91db4ffa94b162015250501&q=${widget.cityName}&aqi=no");
       final response = await http.get(url);
 
       if (response.statusCode != 200) {
@@ -69,125 +75,160 @@ class _HomePageState extends State<HomePage> {
                 : Icons.dark_mode)),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.refresh),
+            onPressed: () {
+              showMenu<String>(
+                context: context,
+                position: RelativeRect.fromLTRB(100, 100, 0, 0),
+                items: [
+                  PopupMenuItem<String>(
+                    value: 'Change Location',
+                    child: Text('Change Location'),
+                    onTap: () {
+                      Future.delayed(Duration.zero, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LocationGet()),
+                        );
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+            icon: Icon(Icons.more_vert),
           ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))
         ],
       ),
       body: temperature == null
           ? Center(child: const CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        cityName,
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Icon(Icons.location_on)
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              "$temperature °C",
-                              style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.bold),
-                            ),
-                            Icon(
-                              Icons.cloud,
-                              size: 80,
-                            ),
-                            Text(
-                              "Rain",
-                              style: TextStyle(fontSize: 25),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Weather Forecast",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        HourlyForecastWidget(
-                          time: "9:00",
-                          icon: Icons.cloud,
-                          temp: "18° C",
+                        Text(
+                          widget.cityName,
+                          style: TextStyle(fontSize: 18),
                         ),
-                        HourlyForecastWidget(
-                          time: "10:00",
-                          icon: Icons.water_drop,
-                          temp: "19° C",
-                        ),
-                        HourlyForecastWidget(
-                          time: "11:00",
-                          icon: Icons.sunny,
-                          temp: "20° C",
-                        ),
-                        HourlyForecastWidget(
-                          time: "12:00",
-                          icon: Icons.cloud,
-                          temp: "21° C",
-                        ),
-                        HourlyForecastWidget(
-                          time: "1:00",
-                          icon: Icons.sunny,
-                          temp: "22° C",
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return LocationGet();
+                                },
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.location_on),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Additionnal Information",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      AdditionalInfoWidget(
-                        icon: Icons.water_drop,
-                        label: "Humadity",
-                        value: "94",
+                    SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                "$temperature °C",
+                                style: TextStyle(
+                                    fontSize: 30, fontWeight: FontWeight.bold),
+                              ),
+                              Icon(
+                                Icons.cloud,
+                                size: 80,
+                              ),
+                              Text(
+                                "Rain",
+                                style: TextStyle(fontSize: 25),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      AdditionalInfoWidget(
-                        icon: Icons.umbrella,
-                        label: "Pressure",
-                        value: "80",
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Weather Forecast",
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          HourlyForecastWidget(
+                            time: "9:00",
+                            icon: Icons.cloud,
+                            temp: "18° C",
+                          ),
+                          HourlyForecastWidget(
+                            time: "10:00",
+                            icon: Icons.water_drop,
+                            temp: "19° C",
+                          ),
+                          HourlyForecastWidget(
+                            time: "11:00",
+                            icon: Icons.sunny,
+                            temp: "20° C",
+                          ),
+                          HourlyForecastWidget(
+                            time: "12:00",
+                            icon: Icons.cloud,
+                            temp: "21° C",
+                          ),
+                          HourlyForecastWidget(
+                            time: "1:00",
+                            icon: Icons.sunny,
+                            temp: "22° C",
+                          ),
+                        ],
                       ),
-                      AdditionalInfoWidget(
-                        icon: Icons.air,
-                        label: "Wind Speed",
-                        value: "75",
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Additionnal Information",
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        AdditionalInfoWidget(
+                          icon: Icons.water_drop,
+                          label: "Humadity",
+                          value: "94",
+                        ),
+                        AdditionalInfoWidget(
+                          icon: Icons.umbrella,
+                          label: "Pressure",
+                          value: "80",
+                        ),
+                        AdditionalInfoWidget(
+                          icon: Icons.air,
+                          label: "Wind Speed",
+                          value: "75",
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
     );
