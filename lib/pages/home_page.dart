@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:weather/pages/location_get.dart';
 import 'package:weather/themes/theme.dart';
 import 'package:weather/widgets/additional_info_widget.dart';
+import 'package:weather/widgets/get_location.dart';
 
 class HomePage extends StatefulWidget {
-  final String cityName;
+  String cityName;
 
-  const HomePage({
+  HomePage({
     super.key,
     this.cityName = "Jamalpur",
   });
@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController textEditingController = TextEditingController();
   double? temperature;
   String? weatherIcon;
   int? isDay;
@@ -92,6 +93,7 @@ class _HomePageState extends State<HomePage> {
                 : Icons.dark_mode)),
         actions: [
           IconButton(
+            color: Color(0xffFF00FF),
             onPressed: () {
               showMenu<String>(
                 context: context,
@@ -101,13 +103,12 @@ class _HomePageState extends State<HomePage> {
                     value: 'Change Location',
                     child: Text('Change Location'),
                     onTap: () {
-                      Future.delayed(Duration.zero, () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LocationGet()),
-                        );
-                      });
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return GetLocation();
+                        },
+                      );
                     },
                   ),
                 ],
@@ -140,16 +141,17 @@ class _HomePageState extends State<HomePage> {
                             ),
                             IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return LocationGet();
-                                    },
-                                  ),
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return GetLocation();
+                                  },
                                 );
                               },
-                              icon: Icon(Icons.location_on),
+                              icon: Icon(
+                                Icons.location_on,
+                                color: Color(0xFF2196F3),
+                              ),
                             ),
                           ],
                         ),
@@ -162,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           border: Border.all(
-                            color: Colors.purple,
+                            color: Colors.blue,
                           ),
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -206,16 +208,19 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         AdditionalInfoWidget(
                           icon: Icons.water_drop,
+                          color: Color(0xFF03A9F4),
                           label: "Humadity",
                           value: "$currentHumadity",
                         ),
                         AdditionalInfoWidget(
                           icon: Icons.man,
+                          color: Color(0xFF607D8B),
                           label: "Feels Like",
                           value: "$currentFeelsLike",
                         ),
                         AdditionalInfoWidget(
                           icon: Icons.air,
+                          color: Color(0xFF00BCD4),
                           label: "Wind Kph",
                           value: "$wind",
                         ),
@@ -238,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         border: Border.all(
-                          color: Colors.purple,
+                          color: Colors.green,
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -249,7 +254,10 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.location_on),
+                                Icon(
+                                  Icons.location_on,
+                                  color: Color(0xFF2196F3),
+                                ),
                                 Text(
                                   widget.cityName + ", " + "$currentCountry",
                                   style: TextStyle(fontSize: 18),
@@ -258,7 +266,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Row(
                               children: [
-                                Icon(Icons.map),
+                                Icon(
+                                  Icons.map,
+                                  color: Color(0xFF4CAF50),
+                                ),
                                 Text(
                                   " $timeZone",
                                   style: TextStyle(fontSize: 18),
@@ -267,7 +278,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Row(
                               children: [
-                                Icon(Icons.watch_later),
+                                Icon(
+                                  Icons.watch_later,
+                                  color: Color(0xFF2196F3),
+                                ),
                                 Text(
                                   " $currentTime",
                                   style: TextStyle(fontSize: 18),

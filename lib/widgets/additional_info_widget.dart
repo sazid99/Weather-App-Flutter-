@@ -4,12 +4,14 @@ class AdditionalInfoWidget extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  
+  final Color? color;
+
   const AdditionalInfoWidget({
     super.key,
     required this.icon,
     required this.label,
     required this.value,
+    this.color,
   });
 
   @override
@@ -19,6 +21,7 @@ class AdditionalInfoWidget extends StatelessWidget {
         Icon(
           icon,
           size: 60,
+          color: color,
         ),
         Text(
           label,
