@@ -26,7 +26,10 @@ class _HomePageState extends State<HomePage> {
   String? updates;
   double? wind;
   int? currentHumadity;
-  double? currentPressure;
+  double? currentFeelsLike;
+  String? currentCountry;
+  String? timeZone;
+  String? currentTime;
 
   Future fetchData() async {
     try {
@@ -48,7 +51,10 @@ class _HomePageState extends State<HomePage> {
             updates = data['current']['condition']['text'];
             wind = data['current']['wind_kph'];
             currentHumadity = data['current']['humidity'];
-            currentPressure = data['current']['pressure_mb'];
+            currentFeelsLike = data['current']['feelslike_c'];
+            currentCountry = data['location']['country'];
+            timeZone = data['location']['tz_id'];
+            currentTime = data['location']['localtime'];
           });
         } else {
           throw Exception('Invalid data format in response');
@@ -152,7 +158,14 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
-                      child: Card(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border.all(
+                            color: Colors.purple,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -197,9 +210,9 @@ class _HomePageState extends State<HomePage> {
                           value: "$currentHumadity",
                         ),
                         AdditionalInfoWidget(
-                          icon: Icons.umbrella,
-                          label: "Pressure",
-                          value: "$currentPressure",
+                          icon: Icons.man,
+                          label: "Feels Like",
+                          value: "$currentFeelsLike",
                         ),
                         AdditionalInfoWidget(
                           icon: Icons.air,
@@ -207,6 +220,63 @@ class _HomePageState extends State<HomePage> {
                           value: "$wind",
                         ),
                       ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "About Location",
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      height: 140,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: Colors.purple,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Column(
+                          spacing: 10,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.location_on),
+                                Text(
+                                  widget.cityName + ", " + "$currentCountry",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.map),
+                                Text(
+                                  " $timeZone",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.watch_later),
+                                Text(
+                                  " $currentTime",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
