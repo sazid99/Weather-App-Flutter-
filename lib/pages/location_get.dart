@@ -21,7 +21,6 @@ class _LocationGetState extends State<LocationGet> {
           centerTitle: true,
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           spacing: 15,
           children: [
             Padding(
@@ -30,6 +29,7 @@ class _LocationGetState extends State<LocationGet> {
                 controller: textEditingController,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
+                  hintText: "Enter city Name here",
                   border: OutlineInputBorder(),
                 ),
               ),

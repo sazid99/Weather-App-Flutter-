@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:weather/pages/location_get.dart';
 import 'package:weather/themes/theme.dart';
 import 'package:weather/widgets/additional_info_widget.dart';
-import 'package:weather/widgets/hourly_forecast_widget.dart';
 
 class HomePage extends StatefulWidget {
   final String cityName;
@@ -22,6 +21,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double? temperature;
+  String? weatherIcon;
+  int? isDay;
+  String? updates;
+  double? wind;
+  int? currentHumadity;
+  double? currentPressure;
 
   Future fetchData() async {
     try {
@@ -38,6 +43,12 @@ class _HomePageState extends State<HomePage> {
         if (data['current']['temp_c'] != null) {
           setState(() {
             temperature = data['current']['temp_c'];
+            weatherIcon = "https:${data['current']['condition']['icon']}";
+            isDay = data['current']['is_day'];
+            updates = data['current']['condition']['text'];
+            wind = data['current']['wind_kph'];
+            currentHumadity = data['current']['humidity'];
+            currentPressure = data['current']['pressure_mb'];
           });
         } else {
           throw Exception('Invalid data format in response');
@@ -109,24 +120,32 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          widget.cityName,
+                          isDay == 1 ? "Day" : "Night",
                           style: TextStyle(fontSize: 18),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return LocationGet();
-                                },
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.location_on),
+                        Row(
+                          children: [
+                            Text(
+                              widget.cityName,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return LocationGet();
+                                    },
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.location_on),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -143,12 +162,14 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     fontSize: 30, fontWeight: FontWeight.bold),
                               ),
-                              Icon(
-                                Icons.cloud,
-                                size: 80,
-                              ),
+                              weatherIcon != null
+                                  ? Image.network(
+                                      weatherIcon!,
+                                      height: 80,
+                                    )
+                                  : SizedBox.shrink(),
                               Text(
-                                "Rain",
+                                "$updates",
                                 style: TextStyle(fontSize: 25),
                               ),
                             ],
@@ -160,47 +181,7 @@ class _HomePageState extends State<HomePage> {
                       height: 10,
                     ),
                     Text(
-                      "Weather Forecast",
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          HourlyForecastWidget(
-                            time: "9:00",
-                            icon: Icons.cloud,
-                            temp: "18° C",
-                          ),
-                          HourlyForecastWidget(
-                            time: "10:00",
-                            icon: Icons.water_drop,
-                            temp: "19° C",
-                          ),
-                          HourlyForecastWidget(
-                            time: "11:00",
-                            icon: Icons.sunny,
-                            temp: "20° C",
-                          ),
-                          HourlyForecastWidget(
-                            time: "12:00",
-                            icon: Icons.cloud,
-                            temp: "21° C",
-                          ),
-                          HourlyForecastWidget(
-                            time: "1:00",
-                            icon: Icons.sunny,
-                            temp: "22° C",
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      "Additionnal Information",
+                      "Additional Information",
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
@@ -213,17 +194,17 @@ class _HomePageState extends State<HomePage> {
                         AdditionalInfoWidget(
                           icon: Icons.water_drop,
                           label: "Humadity",
-                          value: "94",
+                          value: "$currentHumadity",
                         ),
                         AdditionalInfoWidget(
                           icon: Icons.umbrella,
                           label: "Pressure",
-                          value: "80",
+                          value: "$currentPressure",
                         ),
                         AdditionalInfoWidget(
                           icon: Icons.air,
-                          label: "Wind Speed",
-                          value: "75",
+                          label: "Wind Kph",
+                          value: "$wind",
                         ),
                       ],
                     ),
